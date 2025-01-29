@@ -50,33 +50,27 @@ int cmpFIOBefore(FIO f1,FIO f2) {
 void insertion(Data mass[],int n) {
 	int len = n;
 	for (int i = 0; i < len; i++) {
+        if (i % 10 == 0) cout << i << endl;
 		int j = i - 1;
 		Data key = mass[i];
-		while (cmpDateBefore(key.date,mass[j].date) == 0  && j >= 0) {
-            if (cmpDateBefore(key.date, mass[j].date) == 0) {
-                mass[j + 1] = mass[j];
-                j -= 1;
-
-            }
-            else break;
+		while (not(cmpDateBefore(key.date, mass[j].date) == 1) && j >= 0) {
+           
+                if(cmpDateBefore(key.date, mass[j].date) == 2) {
             
-		}
-        while (cmpDateBefore(key.date, mass[j].date) == 2 && j >= 0 ) {
-            
-                if (cmpFIOBefore(key.fio, mass[j].fio) == 1) {
+                    if (cmpFIOBefore(key.fio, mass[j].fio) == 1) {
+                        cout << "repeat " << mass[j].fio.name << " " << mass[j].fio.surname << " " << key.fio.name << " " << key.fio.surname << endl;
+                        mass[j + 1] = mass[j];
+                        j -= 1;
+                    }
+                    else break;
+                }
+                else if (cmpDateBefore(key.date, mass[j].date) == 0) {
                     mass[j + 1] = mass[j];
-                    
-                   // std::cout << "change " << mass[j].date.day << mass[j].date.mouth << mass[j].date.year << mass[j].fio.surname << endl ;
                     j -= 1;
                 }
-                else {// std::cout << " not change " << mass[j].date.day << mass[j].date.mouth << mass[j].date.year << mass[j].fio.surname << endl; 
-                    break; }
         }
+        
         mass[j + 1] = key;
-        /*for (int i = 0; i < 5; i++) {
-            std::cout << "Mass " << mass[i].date.day << mass[i].date.mouth << mass[i].date.year << mass[i].fio.surname << " " ;
-        }*/
-        //cout << endl;
 	}
 	
 }
@@ -103,20 +97,21 @@ void heapify(Data arr[], int n, int i)
     int r = 2 * i + 2; // правый = 2*i + 2
 
     // Если левый дочерний элемент больше корня
-    if (l < n && cmpDateBefore(arr[largest].date,arr[l].date) == 1)
+    if (l < n && cmpDateBefore(arr[l].date,arr[largest].date) == 0)
         largest = l;
-    else  if (l < n && cmpDateBefore(arr[largest].date, arr[l].date) == 2)
+    else  if (l < n && cmpDateBefore(arr[l].date, arr[largest].date) == 2)
     {
-        if(cmpFIOBefore(arr[largest].fio, arr[l].fio))
+        cout << arr[l].date.day << " " << arr[l].date.mouth << " " << arr[l].date.year << " " << arr[l].fio.name << " same with " << arr[largest].date.day << " " << arr[largest].date.mouth << " " << arr[largest].date.year << " " << arr[largest].fio.name << endl;
+        if(cmpFIOBefore(arr[largest].fio, arr[l].fio) == -1)
            largest = l;
     }
         
     // Если правый дочерний элемент больше, чем самый большой элемент на данный момент
-    if (r < n && cmpDateBefore(arr[largest].date, arr[r].date))
+    if (r < n && cmpDateBefore(arr[r].date, arr[largest].date) == 0)
         largest = r;
-    else  if (r < n && cmpDateBefore(arr[largest].date, arr[r].date) == 2)
+    else  if (r < n && cmpDateBefore(arr[r].date, arr[largest].date) == 2)
     {
-        if (cmpFIOBefore(arr[largest].fio, arr[r].fio))
+        if (cmpFIOBefore(arr[largest].fio, arr[r].fio) == -1)
             largest = r;
     }
 
@@ -140,6 +135,7 @@ void heapSort(Data arr[], int n)
     // Один за другим извлекаем элементы из кучи
     for (int i = n - 1; i >= 0; i--)
     {
+        if (i % 1000 == 0) cout << i << endl;
         // Перемещаем текущий корень в конец
         std::swap(arr[0], arr[i]);
 
@@ -148,7 +144,7 @@ void heapSort(Data arr[], int n)
     }
 }
  Data mass[1000000]{};
- Data mass2[1000000]{0};
+ Data mass2[1000000]{};
  int main()
  {   
      int n;
@@ -157,7 +153,7 @@ void heapSort(Data arr[], int n)
      file.open("dateFIO.txt", std::ios::in);
      file >> n;
      cout << n << endl;
-     for (int i = 0; i <= n+1; i++) { // пока не достигнут конец файла класть очередную строку в переменную (s)
+     for (int i = 0; i <= 1000000; i++) { // пока не достигнут конец файла класть очередную строку в переменную (s)
          getline(file, s);
          if (i != 0) {
              Data data;
@@ -191,32 +187,55 @@ void heapSort(Data arr[], int n)
     
     file.close();
     double start = clock();
-	insertion(mass,n);
+    cout << "Start" << endl;
+	insertion(mass,10000);
+    cout << "Start2" << endl;
     double end = clock();
     double time = (end - start)/ CLOCKS_PER_SEC;
 
-    for (int i = 0; i <= n; i++) {
+    for (int i = 0; i < 10000; i++) {
         if (mass[i].date.day < 10) std::cout << "0";
         std::cout << mass[i].date.day << ".";
         if (mass[i].date.mouth < 10) std::cout << "0";
         std::cout << mass[i].date.mouth << "." << mass[i].date.year << " " << mass[i].fio.name << " " << mass[i].fio.surname << " " << mass[i].fio.patronymic << " " << mass[i].number << endl;
     }
+    
+    
     cout << "Time" << time << endl;
    
-    cout << "==================================" << endl;
-    cout << "==================================" << endl;
-    double start2 = clock();
-    heapSort(mass2, n);
-    double end2 = clock();
-    double time2 = (end2 - start2)/ CLOCKS_PER_SEC;
-
-    for (int i = 0; i <= n; i++) {
-        if (mass[i].date.day < 10) std::cout << "0";
-        std::cout << mass[i].date.day << ".";
-        if (mass[i].date.mouth < 10) std::cout << "0";
-        std::cout << mass[i].date.mouth << "." << mass[i].date.year << " " << mass[i].fio.name << " " << mass[i].fio.surname << " " << mass[i].fio.patronymic << " " << mass[i].number << endl;
+   /* cout << "Start" << endl;
+    heapSort(mass2, 1000000);
+    cout << "Start 2" << endl;
+    ofstream out("output.txt");
+    for (int i = 0; i < 1000000; i++) {
+        cout << i << endl;
+        if (mass2[i].date.day < 10) out << "0";
+        out << mass2[i].date.day << ".";
+        if (mass2[i].date.mouth < 10) out << "0";
+        out << mass2[i].date.mouth << "." << mass2[i].date.year << " " << mass2[i].fio.name << " " << mass2[i].fio.surname << " " << mass2[i].fio.patronymic << " " << mass2[i].number << endl;
     }
-    cout << time2 << endl;
+    cout << "FINISH" << endl;*/
+ //   cout << "==================================" << endl;
+ //   cout << "==================================" << endl;
+ //  /* double start2 = clock();
+ //   heapSort(mass2, n);
+ //   double end2 = clock();
+ //   double time2 = (end2 - start2)/ CLOCKS_PER_SEC;
+
+ //   for (int i = 0; i <= n; i++) {
+ //       if (mass2[i].date.day < 10) std::cout << "0";
+ //       std::cout << mass[i].date.day << ".";
+ //       if (mass2[i].date.mouth < 10) std::cout << "0";
+ //       std::cout << mass2[i].date.mouth << "." << mass2[i].date.year << " " << mass2[i].fio.name << " " << mass2[i].fio.surname << " " << mass2[i].fio.patronymic << " " << mass[i].number << endl;
+ //   }
+ //   cout << time2 << endl;*/
+
+   /* string q = "John Frolov Mikhaylovich";
+    if (q.compare("Emily Georgiyeva Anatolyevna") == 1) {
+        cout << "more";
+    }
+    else cout << "less";*/
+
    ///сделать в выходной файл вывод, сделать +2 файла (упорядоченные данные, упорядоченные в обратном порядке) и проверить время работы на них.
 }
 
